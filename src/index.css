@@ -1,0 +1,206 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700&display=swap');
+
+:root {
+  --bg-dark: #090d16;
+  --bg-card: rgba(18, 24, 38, 0.75);
+  --bg-card-hover: rgba(28, 37, 58, 0.85);
+  --border-color: rgba(255, 255, 255, 0.1);
+  --border-active: rgba(247, 147, 26, 0.5);
+  
+  --btc-orange: #f7931a;
+  --btc-orange-glow: rgba(247, 147, 26, 0.25);
+  --accent-cyan: #06b6d4;
+  --accent-purple: #8b5cf6;
+  --accent-emerald: #10b981;
+  --accent-red: #ef4444;
+
+  --text-main: #f3f4f6;
+  --text-muted: #9ca3af;
+  --text-dim: #6b7280;
+
+  --suit-spades: #38bdf8;
+  --suit-hearts: #f87171;
+  --suit-diamonds: #fb923c;
+  --suit-clubs: #34d399;
+
+  --font-main: 'Inter', system-ui, -apple-system, sans-serif;
+  --font-mono: 'JetBrains Mono', monospace;
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  background-color: var(--bg-dark);
+  background-image: 
+    radial-gradient(circle at 15% 15%, rgba(247, 147, 26, 0.08) 0%, transparent 40%),
+    radial-gradient(circle at 85% 85%, rgba(99, 102, 241, 0.08) 0%, transparent 40%),
+    radial-gradient(circle at 50% 50%, rgba(16, 185, 129, 0.04) 0%, transparent 60%);
+  color: var(--text-main);
+  font-family: var(--font-main);
+  min-height: 100vh;
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+  padding-bottom: 3rem;
+}
+
+button {
+  font-family: inherit;
+  cursor: pointer;
+  border: none;
+  background: none;
+}
+
+input, textarea, select {
+  font-family: inherit;
+}
+
+/* Glassmorphism containers */
+.glass-panel {
+  background: var(--bg-card);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid var(--border-color);
+  border-radius: 16px;
+  box-shadow: 0 10px 30px -10px rgba(0, 0, 0, 0.5);
+  transition: all 0.3s ease;
+}
+
+.glass-panel:hover {
+  border-color: rgba(255, 255, 255, 0.18);
+}
+
+/* Custom Scrollbars */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+::-webkit-scrollbar-track {
+  background: rgba(0, 0, 0, 0.2);
+}
+::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.2);
+  border-radius: 4px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: var(--btc-orange);
+}
+
+/* Playing Card styling */
+.card-item {
+  width: 58px;
+  height: 82px;
+  border-radius: 10px;
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  background: linear-gradient(145deg, rgba(30, 41, 59, 0.9), rgba(15, 23, 42, 0.95));
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  padding: 6px 8px;
+  cursor: pointer;
+  user-select: none;
+  transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
+  position: relative;
+  overflow: hidden;
+}
+
+.card-item:hover:not(.disabled) {
+  transform: translateY(-4px) scale(1.05);
+  border-color: var(--btc-orange);
+  box-shadow: 0 8px 20px -4px var(--btc-orange-glow);
+}
+
+.card-item.selected {
+  opacity: 0.25;
+  filter: grayscale(0.8);
+  cursor: not-allowed;
+  transform: scale(0.95);
+}
+
+.card-item.selected-sequence {
+  width: 50px;
+  height: 72px;
+  margin: 2px;
+  font-size: 0.85rem;
+}
+
+.card-item.red {
+  color: var(--suit-hearts);
+}
+
+.card-item.black {
+  color: var(--suit-spades);
+}
+
+.card-rank {
+  font-weight: 700;
+  font-size: 1.1rem;
+  line-height: 1;
+}
+
+.card-symbol {
+  font-size: 1.3rem;
+  align-self: center;
+}
+
+.card-small-suit {
+  font-size: 0.8rem;
+  align-self: flex-end;
+}
+
+/* Suit badges */
+.suit-tab {
+  padding: 8px 16px;
+  border-radius: 10px;
+  border: 1px solid var(--border-color);
+  background: rgba(255, 255, 255, 0.03);
+  color: var(--text-muted);
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  transition: all 0.2s ease;
+}
+
+.suit-tab.active {
+  background: rgba(247, 147, 26, 0.15);
+  border-color: var(--btc-orange);
+  color: var(--btc-orange);
+}
+
+/* Glow & Badges */
+.badge-btc {
+  background: rgba(247, 147, 26, 0.15);
+  color: var(--btc-orange);
+  border: 1px solid rgba(247, 147, 26, 0.3);
+  padding: 4px 10px;
+  border-radius: 20px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+}
+
+.badge-emerald {
+  background: rgba(16, 185, 129, 0.15);
+  color: var(--accent-emerald);
+  border: 1px solid rgba(16, 185, 129, 0.3);
+  padding: 4px 10px;
+  border-radius: 20px;
+  font-size: 0.75rem;
+  font-weight: 600;
+}
+
+/* Monotonic Pulse Animation */
+@keyframes pulseGlow {
+  0% { box-shadow: 0 0 0 0 rgba(247, 147, 26, 0.4); }
+  70% { box-shadow: 0 0 0 10px rgba(247, 147, 26, 0); }
+  100% { box-shadow: 0 0 0 0 rgba(247, 147, 26, 0); }
+}
+
+.pulse-button {
+  animation: pulseGlow 2s infinite;
+}
