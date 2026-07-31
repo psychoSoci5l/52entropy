@@ -2,6 +2,7 @@ import { describe, it, expect } from 'vitest';
 import { FULL_DECK, parseCardInput, generateRandomShuffle } from './cards';
 import { computeLehmerRank, FACTORIAL_52, bigIntToUint8Array32 } from './entropy';
 import { entropyToMnemonic } from './bip39';
+import { deriveBip39Seed } from './bip39Seed';
 
 describe('Card Parsing & Deck Rules', () => {
   it('should parse standard text shorthand correctly', () => {
@@ -49,7 +50,7 @@ describe('Factoradic (Lehmer Code) Engine', () => {
   });
 });
 
-describe('BIP-39 Mnemonic Derivation', () => {
+describe('BIP-39 Mnemonic & Seed Derivation', () => {
   it('should derive valid 12-word mnemonic with checksum', async () => {
     const testBytes = new Uint8Array(32).fill(0xab);
     const mnemonic = await entropyToMnemonic(testBytes, 12);
@@ -62,5 +63,12 @@ describe('BIP-39 Mnemonic Derivation', () => {
     const mnemonic = await entropyToMnemonic(testBytes, 24);
     expect(mnemonic.words).toHaveLength(24);
     expect(mnemonic.phrase.split(' ')).toHaveLength(24);
+  });
+
+  it('should derive 512-bit seed via PBKDF2-HMAC-SHA512', async () => {
+    const phrase = 'abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon about';
+    const seedResult = await deriveBip39Seed(phrase, 'TREZOR');
+    expect(seedResult.seedHex).toHaveLength(128); // 64 bytes = 128 hex characters
+    expect(seedResult.seedHex.length).toBe(128);
   });
 });

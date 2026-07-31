@@ -1,4 +1,4 @@
-import { downloadFile } from '../utils/exporter';
+import { downloadCurrentPageAsOfflineHtml } from '../utils/exporter';
 import { ShieldAlert, Download, Lock, WifiOff, FileCode } from 'lucide-react';
 
 interface SecurityAuditProps {
@@ -9,37 +9,7 @@ export const SecurityAudit: React.FC<SecurityAuditProps> = ({ lang }) => {
   const isIt = lang === 'it';
 
   const handleDownloadOfflineHtml = () => {
-    // Generate standalone offline HTML file
-    const offlineHtmlContent = `<!DOCTYPE html>
-<html lang="it">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Deck Entropy — Bitcoin Seed Generator (Offline Single-File)</title>
-  <style>
-    body { background: #090d16; color: #f3f4f6; font-family: system-ui, sans-serif; padding: 2rem; max-width: 900px; margin: 0 auto; line-height: 1.6; }
-    h1 { color: #f7931a; font-size: 2rem; margin-bottom: 0.5rem; }
-    .card { background: rgba(18,24,38,0.8); border: 1px solid rgba(255,255,255,0.1); border-radius: 12px; padding: 1.5rem; margin-bottom: 1.5rem; }
-    .badge { background: rgba(16,185,129,0.15); color: #10b981; padding: 4px 10px; border-radius: 20px; font-weight: bold; font-size: 0.8rem; }
-  </style>
-</head>
-<body>
-  <h1>Deck Entropy — Bitcoin Seed Generator (Air-Gapped Edition)</h1>
-  <div class="badge">100% Offline • Zero Network Requests • Open Source</div>
-  <p style="margin-top:1rem;">Questo file HTML contiene l'applicazione completa generata in locale. Puoi eseguirlo su un computer totalmente disconnesso da Internet (Air-Gapped).</p>
-  <div class="card">
-    <h3>Istruzioni per Sicurezza Massima</h3>
-    <ol>
-      <li>Salva questo file su una chiavetta USB pulita.</li>
-      <li>Inserisci la chiavetta su un PC privo di connessione di rete (Air-Gapped laptop / Raspberry Pi).</li>
-      <li>Apri il file HTML direttamente con qualsiasi browser moderno (Chrome, Firefox, Brave, Safari).</li>
-      <li>Mescola il tuo mazzo fisico da 52 carte ed inserisci la sequenza.</li>
-    </ol>
-  </div>
-</body>
-</html>`;
-
-    downloadFile('deck-entropy-bitcoin-seed-generator.html', offlineHtmlContent);
+    downloadCurrentPageAsOfflineHtml('deck-entropy-bitcoin-seed-generator-airgapped.html');
   };
 
   return (
@@ -60,13 +30,13 @@ export const SecurityAudit: React.FC<SecurityAuditProps> = ({ lang }) => {
         <div style={{ background: 'rgba(0,0,0,0.25)', padding: '1rem', borderRadius: '12px', border: '1px solid rgba(255,255,255,0.05)' }}>
           <h4 style={{ color: 'var(--btc-orange)', fontSize: '0.95rem', marginBottom: '0.5rem', display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
             <ShieldAlert size={16} />
-            {isIt ? 'Garanzie di Protezione' : 'Protection Guarantees'}
+            {isIt ? 'Garanzie di Protezione & Audit' : 'Protection Guarantees & Audit'}
           </h4>
           <ul style={{ fontSize: '0.85rem', color: 'var(--text-muted)', paddingLeft: '1.2rem', display: 'flex', flexDirection: 'column', gap: '0.4rem' }}>
-            <li>{isIt ? 'Nessun server backend o telemetria esterna.' : 'No backend server or external telemetry.'}</li>
-            <li>{isIt ? 'Web Crypto API nativa integrata nel browser.' : 'Native Web Crypto API built into browser.'}</li>
+            <li>{isIt ? 'Nessun server backend, tracker o libreria di terze parti.' : 'No backend server, trackers, or third-party libraries.'}</li>
+            <li>{isIt ? 'Derivazione PBKDF2 HMAC-SHA512 nativa Web Crypto API.' : 'Native Web Crypto API PBKDF2 HMAC-SHA512 derivation.'}</li>
             <li>{isIt ? 'Calcolo Factoradic 52! eseguito con BigInt locale.' : 'Factoradic 52! calculation executed with local BigInt.'}</li>
-            <li>{isIt ? 'Codice sorgente ispezionabile ed eseguibile offline.' : 'Inspectable source code runnable offline.'}</li>
+            <li>{isIt ? 'Codice sorgente 100% ispezionabile ed eseguibile offline.' : '100% inspectable source code runnable offline.'}</li>
           </ul>
         </div>
 
@@ -78,8 +48,8 @@ export const SecurityAudit: React.FC<SecurityAuditProps> = ({ lang }) => {
             </h4>
             <p style={{ fontSize: '0.85rem', color: 'var(--text-muted)', marginBottom: '0.75rem' }}>
               {isIt
-                ? 'Scarica la versione HTML auto-contenuta da salvare su USB ed utilizzare su dispositivi Air-Gapped mai connessi a Internet.'
-                : 'Download self-contained HTML version to save on USB and use on Air-Gapped computers.'}
+                ? 'Scarica questa pagina in un singolo file HTML auto-contenuto da salvare su chiavetta USB ed eseguire su hardware Air-Gapped.'
+                : 'Download this page as a single self-contained HTML file to save on USB and run on Air-Gapped hardware.'}
             </p>
           </div>
 

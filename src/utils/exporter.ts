@@ -12,3 +12,11 @@ export function downloadFile(filename: string, content: string, mimeType: string
   document.body.removeChild(a);
   URL.revokeObjectURL(url);
 }
+
+/**
+ * Downloads the currently running HTML document as a standalone offline file.
+ */
+export function downloadCurrentPageAsOfflineHtml(filename: string = 'deck-entropy-bitcoin-seed-generator.html') {
+  const htmlContent = document.documentElement.outerHTML;
+  downloadFile(filename, `<!DOCTYPE html>\n${htmlContent}`);
+}

@@ -1,6 +1,8 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import type { MnemonicResult as MnemonicResultType } from '../utils/bip39';
-import { KeyRound, Eye, EyeOff, Copy, Check, ShieldCheck } from 'lucide-react';
+import type { DerivedBip39Seed } from '../utils/bip39Seed';
+import { deriveBip39Seed } from '../utils/bip39Seed';
+import { KeyRound, Eye, EyeOff, Copy, Check, ShieldCheck, Lock, Terminal } from 'lucide-react';
 
 interface MnemonicResultProps {
   mnemonic: MnemonicResultType | null;
@@ -16,9 +18,31 @@ export const MnemonicResult: React.FC<MnemonicResultProps> = ({
   lang,
 }) => {
   const [isMasked, setIsMasked] = useState(true);
+  const [passphrase, setPassphrase] = useState('');
+  const [derivedSeed, setDerivedSeed] = useState<DerivedBip39Seed | null>(null);
   const [copiedField, setCopiedField] = useState<string | null>(null);
 
   const isIt = lang === 'it';
+
+  // Compute 512-bit seed via PBKDF2 whenever phrase or passphrase changes
+  useEffect(() => {
+    let isCancelled = false;
+
+    if (!mnemonic) {
+      setDerivedSeed(null);
+      return;
+    }
+
+    deriveBip39Seed(mnemonic.phrase, passphrase).then((seed) => {
+      if (!isCancelled) {
+        setDerivedSeed(seed);
+      }
+    });
+
+    return () => {
+      isCancelled = true;
+    };
+  }, [mnemonic, passphrase]);
 
   const handleCopy = (text: string, fieldName: string) => {
     navigator.clipboard.writeText(text);
@@ -140,6 +164,46 @@ export const MnemonicResult: React.FC<MnemonicResultProps> = ({
             ))}
           </div>
 
+          {/* Optional BIP-39 Passphrase Field (25th Word) */}
+          <div style={{ background: 'rgba(0,0,0,0.25)', padding: '12px', borderRadius: '12px', marginBottom: '1rem', border: '1px solid rgba(255,255,255,0.05)' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '0.4rem', fontSize: '0.85rem', fontWeight: 600, color: 'var(--btc-orange)', marginBottom: '6px' }}>
+              <Lock size={16} />
+              <span>{isIt ? 'Passphrase BIP-39 Opzionale (25ª Parola / "Extension"):' : 'Optional BIP-39 Passphrase (25th Word / Extension):'}</span>
+            </div>
+            <input
+              type={isMasked ? 'password' : 'text'}
+              value={passphrase}
+              onChange={(e) => setPassphrase(e.target.value)}
+              placeholder={isIt ? 'Inserisci passphrase opzionale per protezione ulteriore...' : 'Enter optional passphrase for extra security...'}
+              style={{
+                width: '100%',
+                padding: '8px 12px',
+                borderRadius: '8px',
+                background: 'rgba(0,0,0,0.4)',
+                border: '1px solid var(--border-color)',
+                color: 'var(--text-main)',
+                fontFamily: 'var(--font-mono)',
+                fontSize: '0.85rem',
+              }}
+            />
+          </div>
+
+          {/* 512-bit Master Root Seed (PBKDF2 HMAC-SHA512) */}
+          {derivedSeed && (
+            <div style={{ background: 'rgba(0,0,0,0.3)', padding: '12px', borderRadius: '12px', marginBottom: '1.25rem', border: '1px solid rgba(255,255,255,0.05)' }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '4px' }}>
+                <span style={{ display: 'flex', alignItems: 'center', gap: '0.4rem', fontSize: '0.8rem', fontWeight: 600, color: 'var(--accent-purple)' }}>
+                  <Terminal size={14} />
+                  {isIt ? 'BIP-39 Master Seed 512-bit (PBKDF2 HMAC-SHA512 2048 Hex):' : 'BIP-39 Master 512-bit Seed (PBKDF2 HMAC-SHA512 2048 Hex):'}
+                </span>
+                <span style={{ fontSize: '0.7rem', color: 'var(--text-muted)' }}>Path Standard: m/84'/0'/0' (Native SegWit bc1q)</span>
+              </div>
+              <div style={{ fontFamily: 'var(--font-mono)', fontSize: '0.75rem', color: isMasked ? 'var(--text-dim)' : 'var(--accent-purple)', wordBreak: 'break-all', fontWeight: 600 }}>
+                {isMasked ? '••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••' : derivedSeed.seedHex}
+              </div>
+            </div>
+          )}
+
           {/* Action Row */}
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '0.75rem', background: 'rgba(0,0,0,0.2)', padding: '12px', borderRadius: '12px' }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: '0.4rem', color: 'var(--accent-emerald)', fontSize: '0.85rem' }}>
@@ -149,7 +213,7 @@ export const MnemonicResult: React.FC<MnemonicResultProps> = ({
               </span>
             </div>
 
-            <div style={{ display: 'flex', gap: '0.5rem' }}>
+            <div style={{ display: 'flex', gap: '0.5rem', flexWrap: 'wrap' }}>
               <button
                 onClick={() => handleCopy(mnemonic.phrase, 'phrase')}
                 disabled={isMasked}
@@ -170,6 +234,30 @@ export const MnemonicResult: React.FC<MnemonicResultProps> = ({
                   ? (isIt ? 'Copiato!' : 'Copied!')
                   : (isIt ? 'Copia Frase Seed' : 'Copy Seed Phrase')}
               </button>
+
+              {derivedSeed && (
+                <button
+                  onClick={() => handleCopy(derivedSeed.seedHex, 'seed')}
+                  disabled={isMasked}
+                  style={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '0.4rem',
+                    padding: '8px 16px',
+                    borderRadius: '8px',
+                    background: isMasked ? 'rgba(255,255,255,0.05)' : 'rgba(139, 92, 246, 0.2)',
+                    border: '1px solid rgba(139, 92, 246, 0.4)',
+                    color: isMasked ? 'var(--text-dim)' : 'var(--accent-purple)',
+                    fontWeight: 700,
+                    fontSize: '0.85rem',
+                  }}
+                >
+                  {copiedField === 'seed' ? <Check size={16} /> : <Copy size={16} />}
+                  {copiedField === 'seed'
+                    ? (isIt ? 'Copiato!' : 'Copied!')
+                    : (isIt ? 'Copia Seed Hex 512-bit' : 'Copy 512-bit Seed Hex')}
+                </button>
+              )}
             </div>
           </div>
         </div>
