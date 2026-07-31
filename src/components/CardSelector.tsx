@@ -37,15 +37,11 @@ export const CardSelector: React.FC<CardSelectorProps> = ({ selectedCards, onSel
 
           {SUITS.map((suit) => {
             const countInSuit = selectedCards.filter((c) => c.suit === suit.code).length;
-            const isRed = suit.isRed;
             return (
               <button
                 key={suit.code}
                 className={`suit-tab ${activeSuit === suit.code ? 'active' : ''}`}
                 onClick={() => setActiveSuit(suit.code)}
-                style={{
-                  color: activeSuit === suit.code ? undefined : isRed ? '#c0392b' : '#1a1a2e',
-                }}
               >
                 <span>{suit.symbol}</span>
                 <span>{isIt ? suit.name : suit.nameEn}</span>
