@@ -89,19 +89,19 @@ export function App() {
         {/* Card Selector — full width, all 52 cards visible without scrolling */}
         <CardSelector selectedCards={selectedCards} onSelectCard={handleSelectCard} lang={lang} />
 
-        {/* Quick Text + Deck Progress side by side */}
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))', gap: '1.25rem' }}>
-          <QuickTextInput onApplyCards={handleApplyCards} lang={lang} />
-          <DeckProgress
-            selectedCards={selectedCards}
-            onRemoveCard={handleRemoveCard}
-            onUndo={handleUndo}
-            onReset={handleReset}
-            onDemoShuffle={handleDemoShuffle}
-            isDemoDeck={isDemoDeck}
-            lang={lang}
-          />
-        </div>
+        {/* Deck Progress — compact strip, always visible while selecting */}
+        <DeckProgress
+          selectedCards={selectedCards}
+          onRemoveCard={handleRemoveCard}
+          onUndo={handleUndo}
+          onReset={handleReset}
+          onDemoShuffle={handleDemoShuffle}
+          isDemoDeck={isDemoDeck}
+          lang={lang}
+        />
+
+        {/* Quick Text Input */}
+        <QuickTextInput onApplyCards={handleApplyCards} lang={lang} />
 
         {/* Entropy Calculation Display */}
         <EntropyDisplay

@@ -26,121 +26,113 @@ export const DeckProgress: React.FC<DeckProgressProps> = ({
   const isIt = lang === 'it';
 
   return (
-    <div className="panel" style={{ padding: '1.25rem' }}>
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.75rem', flexWrap: 'wrap', gap: '0.6rem' }}>
-        <div>
-          <h3 style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', fontSize: '1.1rem', fontWeight: 600 }}>
-            <ListOrdered size={20} color="var(--accent)" />
-            {isIt ? 'Sequenza Carte Inserite' : 'Entered Card Sequence'}
-            <span
-              style={{
-                fontSize: '0.85rem',
-                fontWeight: 700,
-                color: isComplete ? 'var(--ok)' : 'var(--accent)',
-                background: 'var(--bg-base)',
-                padding: '2px 10px',
-                borderRadius: 'var(--radius-sm)',
-              }}
-            >
-              {count} / 52
-            </span>
-          </h3>
+    <div className="panel" style={{ padding: '0.9rem 1.25rem' }}>
+      {/* ── Header row: title, count, progress, actions ── */}
+      <div style={{
+        display: 'flex',
+        alignItems: 'center',
+        gap: '0.75rem',
+        flexWrap: 'wrap',
+        marginBottom: count > 0 ? '0.6rem' : '0',
+      }}>
+        <h3 style={{ display: 'flex', alignItems: 'center', gap: '0.4rem', fontSize: '1rem', fontWeight: 600, whiteSpace: 'nowrap' }}>
+          <ListOrdered size={18} color="var(--accent)" />
+          {isIt ? 'Sequenza' : 'Sequence'}
+          <span style={{
+            fontSize: '0.82rem',
+            fontWeight: 700,
+            color: isComplete ? 'var(--ok)' : 'var(--accent)',
+            background: 'var(--bg-base)',
+            padding: '1px 8px',
+            borderRadius: 'var(--radius-sm)',
+          }}>
+            {count}/52
+          </span>
+        </h3>
+
+        <div className="progress-track" style={{ flex: 1, minWidth: '80px', height: '5px' }}>
+          <div
+            className={`progress-fill ${isComplete ? 'complete' : 'incomplete'}`}
+            style={{ width: `${progressPct}%` }}
+          />
         </div>
 
-        <div style={{ display: 'flex', gap: '0.5rem', flexWrap: 'wrap' }}>
-          <button onClick={onUndo} disabled={count === 0} className="btn-secondary">
-            <Undo2 size={15} />
-            {isIt ? 'Annulla Ultima' : 'Undo Last'}
+        <div style={{ display: 'flex', gap: '0.4rem', flexShrink: 0 }}>
+          <button onClick={onUndo} disabled={count === 0} className="btn-secondary" style={{ padding: '4px 10px', fontSize: '0.78rem' }}>
+            <Undo2 size={14} />
+            {isIt ? 'Annulla' : 'Undo'}
           </button>
-
-          <button onClick={onReset} disabled={count === 0} className="btn-danger">
-            <RotateCcw size={15} />
+          <button onClick={onReset} disabled={count === 0} className="btn-danger" style={{ padding: '4px 10px', fontSize: '0.78rem' }}>
+            <RotateCcw size={14} />
             {isIt ? 'Resetta' : 'Reset'}
           </button>
-
-          <button onClick={onDemoShuffle} className="btn-primary">
-            <Shuffle size={15} />
-            {isIt ? 'Demo Mescolata' : 'Demo Shuffle'}
+          <button onClick={onDemoShuffle} className="btn-primary" style={{ padding: '4px 12px', fontSize: '0.78rem' }}>
+            <Shuffle size={14} />
+            {isIt ? 'Demo' : 'Demo'}
           </button>
         </div>
       </div>
 
-      {/* ─── SECURITY WARNING: Demo Deck ─────────────────────── */}
+      {/* ── Warning banner (demo only) ── */}
       {isDemoDeck && count > 0 && (
         <div style={{
           display: 'flex',
           alignItems: 'flex-start',
-          gap: '0.6rem',
+          gap: '0.5rem',
           color: 'var(--err)',
-          fontSize: '0.84rem',
-          marginBottom: '0.75rem',
+          fontSize: '0.78rem',
+          marginBottom: '0.6rem',
           background: 'var(--err-muted)',
-          padding: '10px 14px',
-          borderRadius: 'var(--radius-md)',
-          border: '1px solid rgba(239, 68, 68, 0.25)',
+          padding: '8px 12px',
+          borderRadius: 'var(--radius-sm)',
+          border: '1px solid rgba(239, 68, 68, 0.2)',
         }}>
-          <ShieldAlert size={18} style={{ flexShrink: 0, marginTop: '1px' }} />
-          <div>
-            <strong>{isIt ? '⚠️ ATTENZIONE: Entropia NON sicura!' : '⚠️ WARNING: Insecure Entropy!'}</strong>
-            <br />
-            {isIt
-              ? "Questa sequenza usa Math.random() del browser, NON è crittograficamente sicura. Per un seed Bitcoin reale, mescola un mazzo fisico e inserisci le carte manualmente. Usa la Demo solo per test."
-              : "This sequence uses the browser's Math.random(), which is NOT cryptographically secure. For a real Bitcoin seed, shuffle a physical deck and enter the cards manually. Use Demo for testing only."}
-          </div>
-        </div>
-      )}
-
-      {/* Progress Bar */}
-      <div className="progress-track" style={{ marginBottom: '1rem' }}>
-        <div
-          className={`progress-fill ${isComplete ? 'complete' : 'incomplete'}`}
-          style={{ width: `${progressPct}%` }}
-        />
-      </div>
-
-      {/* Status banner */}
-      {isComplete ? (
-        <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', color: 'var(--ok)', fontSize: '0.88rem', marginBottom: '1rem', background: 'var(--ok-muted)', padding: '8px 12px', borderRadius: 'var(--radius-md)', border: '1px solid rgba(16, 185, 129, 0.18)' }}>
-          <CheckCircle2 size={18} />
+          <ShieldAlert size={16} style={{ flexShrink: 0, marginTop: '1px' }} />
           <span>
-            {isIt
-              ? 'Mazzo completo di 52 carte verificato! Entropia massima (~225.58 bit) calcolata.'
-              : 'Complete 52-card deck verified! Maximum entropy (~225.58 bits) calculated.'}
-          </span>
-        </div>
-      ) : (
-        <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', color: 'var(--text-secondary)', fontSize: '0.84rem', marginBottom: '1rem' }}>
-          <AlertTriangle size={16} color="var(--accent)" />
-          <span>
-            {isIt
-              ? `Seleziona le carte rimanenti (${52 - count} mancanti) per completare l'entropia del mazzo.`
-              : `Select remaining cards (${52 - count} left) to complete deck entropy.`}
+            <strong>{isIt ? '⚠️ Demo — Entropia NON sicura.' : '⚠️ Demo — Insecure entropy.'}</strong>
+            {' '}{isIt
+              ? 'Usa Math.random(). Per un seed reale mescola un mazzo fisico.'
+              : 'Uses Math.random(). For a real seed, shuffle a physical deck.'}
           </span>
         </div>
       )}
 
-      {/* Selected Cards Strip */}
-      <div
-        style={{
-          display: 'flex',
-          flexWrap: 'wrap',
-          gap: '6px',
-          maxHeight: '220px',
-          overflowY: 'auto',
-          padding: '10px',
-          background: 'var(--bg-elevated)',
-          borderRadius: 'var(--radius-md)',
-          border: '1px solid var(--border-subtle)',
-          minHeight: '80px',
-          alignItems: count === 0 ? 'center' : 'flex-start',
-          justifyContent: count === 0 ? 'center' : 'flex-start',
-        }}
-      >
+      {/* ── Status line ── */}
+      {count > 0 && (
+        <div style={{ fontSize: '0.78rem', marginBottom: count > 0 ? '0.5rem' : '0' }}>
+          {isComplete ? (
+            <span style={{ display: 'flex', alignItems: 'center', gap: '0.35rem', color: 'var(--ok)' }}>
+              <CheckCircle2 size={14} />
+              {isIt ? 'Mazzo completo! ~225.58 bit di entropia calcolati.' : 'Complete deck! ~225.58 bits of entropy calculated.'}
+            </span>
+          ) : (
+            <span style={{ display: 'flex', alignItems: 'center', gap: '0.35rem', color: 'var(--text-secondary)' }}>
+              <AlertTriangle size={14} color="var(--accent)" />
+              {isIt
+                ? `${52 - count} carte mancanti per completare l'entropia.`
+                : `${52 - count} cards remaining to complete entropy.`}
+            </span>
+          )}
+        </div>
+      )}
+
+      {/* ── Card strip — horizontal scroll, single row ── */}
+      <div style={{
+        display: 'flex',
+        gap: '5px',
+        overflowX: 'auto',
+        padding: count === 0 ? '0.5rem' : '6px',
+        background: 'var(--bg-elevated)',
+        borderRadius: 'var(--radius-sm)',
+        border: '1px solid var(--border-subtle)',
+        minHeight: count === 0 ? '36px' : 'auto',
+        alignItems: 'center',
+      }}>
         {count === 0 ? (
-          <p style={{ color: 'var(--text-tertiary)', fontSize: '0.88rem', fontStyle: 'italic' }}>
+          <p style={{ color: 'var(--text-tertiary)', fontSize: '0.8rem', margin: 0, whiteSpace: 'nowrap' }}>
             {isIt
-              ? 'Nessuna carta selezionata. Clicca sulle carte in alto o usa la Demo Mescolata per iniziare.'
-              : 'No cards selected yet. Click cards above or use Demo Shuffle to begin.'}
+              ? 'Clicca sulle carte qui sopra — appariranno in sequenza.'
+              : 'Click cards above — they\'ll appear here in sequence.'}
           </p>
         ) : (
           selectedCards.map((card, idx) => (
@@ -149,12 +141,13 @@ export const DeckProgress: React.FC<DeckProgressProps> = ({
               className={`card-item selected-sequence ${card.isRed ? 'red' : 'black'}`}
               onClick={() => onRemoveCard(idx)}
               title={isIt ? `Clicca per rimuovere ${card.id}` : `Click to remove ${card.id}`}
+              style={{ flexShrink: 0 }}
             >
-              <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.72rem', fontWeight: 700 }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.7rem', fontWeight: 700 }}>
                 <span>{card.rank}</span>
-                <span style={{ color: 'var(--text-tertiary)', fontSize: '0.62rem' }}>#{idx + 1}</span>
+                <span style={{ color: 'var(--text-tertiary)', fontSize: '0.6rem' }}>#{idx + 1}</span>
               </div>
-              <div style={{ fontSize: '0.95rem', textAlign: 'center' }}>{card.symbol}</div>
+              <div style={{ fontSize: '0.9rem', textAlign: 'center' }}>{card.symbol}</div>
             </div>
           ))
         )}
