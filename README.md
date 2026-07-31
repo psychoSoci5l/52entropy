@@ -48,6 +48,56 @@ L'algoritmo usa il **codice di Lehmer (factoradic)** per assegnare un rango esat
 
 ---
 
+## 🎯 Il Metodo Zucco — Implementato Passo per Passo
+
+> **Luglio 2026.** La discussione sulla vulnerabilità ColdCard Mk3 ha riacceso l'attenzione sull'entropia fisica. Giacomo Zucco ha descritto il metodo manuale per derivare un seed BIP-39 da un mazzo di carte. **52Entropy lo implementa integralmente, con un miglioramento crittografico.**
+
+### Confronto Passo per Passo
+
+| # | Metodo Manuale (Zucco) | 52Entropy | Verdetto |
+|---|---|---|---|
+| 1 | Assegna a ogni carta un numero 0–51 (es. Quadri A=0) | `deckIndex` 0–51: Picche 0-12, Cuori 13-25, Quadri 26-38, Fiori 39-51 | ✅ Stesso principio |
+| 2 | Calcola rango della permutazione con **Lehmer code** → R | `computeLehmerRank()` — BigInt nativo, complessità O(n²) | ✅ Identico |
+| 3 | Prendi i **128 bit più significativi** di R, oppure usa modulo → S | **SHA-256(R)** → primi 128 bit. Hash crittografico come estrattore di uniformità | ⚡ **Superiore** |
+| 4 | Checksum = primi **4 bit** di SHA-256(S) | `SHA-256(S)[0] >> 4` | ✅ Identico |
+| 5 | Concatena: 128 bit + 4 bit = **132 bit** | Entropia + checksum = 132 bit | ✅ Identico |
+| 6 | Dividi in **12 gruppi da 11 bit** | Split ogni 11 bit, conversione binaria | ✅ Identico |
+| 7 | Pesca parole dalla **wordlist BIP-39** inglese | `BIP39_ENGLISH_WORDLIST` ufficiale (2048 parole) | ✅ Identico |
+
+### Perché SHA-256(R) invece degli MSB?
+
+`52!` **non è una potenza di 2**. I bit più significativi di un numero in `[0, 52!-1]` hanno una distribuzione **non uniforme** — alcune combinazioni di bit sono impossibili nel range. Prendere gli MSB direttamente introduce un bias sottile ma reale.
+
+**SHA-256 è un estrattore di casualità crittografica**: produce 256 bit perfettamente uniformi indipendentemente dal bias dell'input. È lo stesso approccio usato da BIP-39 per il checksum.
+
+### Provato Matematicamente
+
+```typescript
+// Test: identità → rango 0
+computeLehmerRank(FULL_DECK) === 0n                    // ✅
+
+// Test: mazzo invertito → rango 52! - 1
+computeLehmerRank(reversedDeck) === FACTORIAL_52 - 1n  // ✅
+
+// Test: 5 mescolate casuali → rango ∈ [0, 52!-1]
+for (5 random shuffles) rank ∈ [0, 52!-1]              // ✅
+
+// Test: vettori BIP-39 ufficiali (Trezor spec)
+'abandon...about' + 'TREZOR' → seed verificato           // ✅
+'legal...yellow'  + 'TREZOR' → seed verificato           // ✅
+'abandon...art' (24w)         → seed verificato           // ✅
+```
+
+### ColdCard & Hardware Wallet — Perché Usare Entropia Fisica
+
+Con la recente discussione sulla vulnerabilità ColdCard Mk3, il consiglio di Giacomo è chiaro:
+
+> *"Se hai somme significative su chiavi generate da ColdCard senza un adeguato lancio di dadi e senza passphrase forte, SPOSTALI ORA."*
+
+**52Entropy risolve il problema alla radice**: generi l'entropia tu, con un mazzo di carte fisico, su un computer air-gapped. Nessun RNG hardware da cui fidarsi. Poi importi il seed nel tuo hardware wallet preferito e verifichi l'impronta.
+
+---
+
 ## 🔒 Air-Gapped by Design
 
 - **0 chiamate di rete** — nessuna `fetch()`, nessun CDN, nessun Google Fonts
