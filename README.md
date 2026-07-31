@@ -1,80 +1,139 @@
-# Deck Entropy — Bitcoin Seed Generator 🃏⚡
+# 🃏⚡ 52Entropy — Physical Deck to Bitcoin BIP-39 Seed Generator
 
-> **Inspired by Giacomo Zucco's Vision on X / Twitter**
+![52Entropy Interface](public/52entropy_ui_preview.png)
+
+> **Un omaggio all'intuizione di Giacomo Zucco su X (Twitter)**
 > 
-> *"Calcolare l'entropia equivalente esatta é pallosissimo. Ma un mazzo di 52 carte ben mescolato ha piú di 128 bit. Ci sono metodi non noiosi anche se matematicamente meno eleganti. Un tool che parte dal mazzo e genera seed sul device sarebbe top. :)"*
-> — [@giacomozucco](https://x.com/giacomozucco)
+> *"Calcolare l'entropia equivalente esatta é pallosissimo. Ma un mazzo di 52 carte ben mescolato ha piú di 128 bit. Ci sono metodi non noiosi anche se matematicamente meno eleganti. Un tool che parte dal mazzo e genera seed sul device sarebbe top. :)"*  
+> — **Giacomo Zucco** ([@giacomozucco](https://x.com/giacomozucco))
 
 ---
 
-## 📌 Overview
+## 📋 Indice
 
-**Deck Entropy** is an open-source, 100% client-side, air-gapped security tool designed to derive cryptographically secure **Bitcoin BIP-39 seed phrases** (12 or 24 words) directly from a physical, shuffled 52-card playing deck.
-
-No tedious binary conversions, no manual dice rolling, and **zero network calls**. You simply unpack your physical deck, enter the card order via the visual card picker or text shorthand, and the application computes the exact mathematical entropy and derives your BIP-39 seed mnemonic.
+1. [Il Problema Iniziale](#-il-problema-iniziale)
+2. [Le Soluzioni Tradizionali ed i Loro Limiti](#-le-soluzioni-tradizionali-ed-i-loro-limiti)
+3. [L'Intuizione di Giacomo Zucco](#-lintuizione-di-giacomo-zucco)
+4. [La Nostra Soluzione: 52Entropy](#-la-nostra-soluzione-52entropy)
+5. [Fondamenti Matematici](#-fondamenti-matematici)
+6. [Architettura & Sicurezza Air-Gapped](#-architettura--sicurezza-air-gapped)
+7. [Guida all'Uso Offline](#-guida-alluso-offline)
+8. [Verifica & Suite di Test](#-verifica--suite-di-test)
+9. [Ringraziamenti & Licenza](#-ringraziamenti--licenza)
 
 ---
 
-## 🧮 Mathematical & Cryptographic Foundation
+## 🚨 Il Problema Iniziale
 
-### 1. Entropy of a Shuffled Deck
-A standard deck of 52 playing cards has $52!$ (52 factorial) possible permutations:
+La generazione di chiavi private Bitcoin si basa in modo critico sull'**entropia** (casualità pura). Tuttavia, fare affidamento esclusivamente su:
+- Generatori di numeri pseudo-casuali (PRNG) software integrati nei sistemi operativi,
+- Chip hardware o risorse di sistema potenzialmente compromesse o con bug di implementazione,
+
+ha storicamente causato gravi vulnerabilità ed eventi di scioglimento/svuotamento dei wallet. Generare entropia mediante **oggetti fisici reali** (dadi, monete, carte da gioco) elimina ogni dipendenza da hardware invisibile o codice di terze parti.
+
+---
+
+## 🎲 Le Soluzioni Tradizionali ed i Loro Limiti
+
+Quando gli utenti cercano di generare entropia fisica in autonomia:
+
+* **Monete**: Una moneta fornisce 1 bit di entropia per lancio ($H = \log_2(2) = 1$). Generare 128 bit richiede almeno 128 lanci consecutivi con trascrizione manuale di testa/croce ($0/1$). È un processo lungo, noioso e incline ad errori umani.
+* **Dadi a 6 facce**: Ogni lancio fornisce $\log_2(6) \approx 2.585$ bit. Richiede circa 50 lanci e complesse tabelle di conversione in base binaria/esadecimale.
+* **Carte da gioco**: Un mazzo da 52 carte ben mescolato contiene un'entropia immensa. Tuttavia, **la mappatura manuale da carte a valori binari è estremamente laboriosa** ("pallosissima"), poiché richiede di assegnare indici, verificare i semi e calcolare le permutazioni a mano.
+
+---
+
+## 💡 L'Intuizione di Giacomo Zucco
+
+Durante una discussione su X legata alla sicurezza dei wallet, Luca Venturini obiettava che mappare le carte in binario a mano fosse troppo complesso rispetto ad una moneta. 
+
+Giacomo Zucco ha colto il punto fondamentale:
+
+> **Un singolo mazzo da 52 carte ben mescolato contiene $52!$ permutazioni possibili, equivalenti a $\approx 225.58$ bit di entropia pura.**
+> 
+> Poiché a Bitcoin servono 128 bit (per 12 parole BIP-39) o 256 bit (per 24 parole), **un mazzo da 52 carte è più che sufficiente**. Non serve fare la matematica a mano: basta un software locale, trasparente e privo di connessione di rete che legga l'ordine delle carte dal mazzo ed estragga l'entropia ed il seed BIP-39 direttamente sul dispositivo.
+
+---
+
+## ⚡ La Nostra Soluzione: 52Entropy
+
+**52Entropy** trasforma questa intuizione in uno strumento web/offline open-source, trasparente e privo di qualsiasi dipendenza di rete:
+
+- 🃏 **Selezione Visiva & Parser Testuale**: Inserisci l'ordine delle carte estratte dal mazzo tramite una griglia visiva o incollando shorthand come `AS 10H KD 2C`.
+- 🧮 **Doppio Motore di Entropia**:
+  1. **Matematico Esatto (Rango di Lehmer / Factoradic)**: Converte la permutazione del mazzo nel suo numero esatto in $[0, 52!-1]$ tramite `BigInt` locale.
+  2. **Pragmatico (Stringa Canonica SHA-256)**: Hashing diretto della sequenza canonica ordinata.
+- 🔑 **Standard BIP-39 Compliant**: Generazione di 12 o 24 parole con checksum SHA-256 verificato, **passphrase opzionale (25ª parola)** e derivazione **Master Seed 512-bit (PBKDF2 HMAC-SHA512)**.
+- 🛡️ **Air-Gapped Single-File Bundle**: Compilazione in un unico file `.html` autonomo da salvare su USB ed eseguire su hardware disconnesso da Internet.
+
+---
+
+## 📐 Fondamenti Matematici
+
+### 1. Entropia Totale del Mazzo
+Il numero totale di modi in cui un mazzo di 52 carte distinte può essere ordinato è dato da $52!$:
 
 $$52! = 80,658,175,170,943,878,571,660,636,856,403,766,975,289,505,440,883,277,824,000,000,000,000$$
 
-The total information entropy in bits provided by a well-shuffled 52-card deck is:
+L'entropia in bit è espressa da:
 
-$$\text{Entropy} = \log_2(52!) \approx 225.58 \text{ bits}$$
+$$\text{Entropia} = \log_2(52!) \approx 225.581 \text{ bits}$$
 
-### 2. Bitcoin BIP-39 Requirements
-- **12 Mnemonic Words**: Requires **128 bits** of entropy (+ 4-bit checksum = 132 bits).
-- **24 Mnemonic Words**: Requires **256 bits** of entropy (+ 8-bit checksum = 264 bits).
+### 2. Confronto Requisiti Bitcoin
+- **12 Parole BIP-39**: 128 bit di entropia + 4 bit checksum.
+- **24 Parole BIP-39**: 256 bit di entropia + 8 bit checksum.
 
-Since $225.58 \text{ bits} \gg 128 \text{ bits}$, a single well-shuffled 52-card deck provides far more entropy than needed for a standard 12-word Bitcoin wallet seed.
-
----
-
-## ⚡ Dual Entropy Engines
-
-This tool provides two selectable calculation engines:
-
-1. **Exact Factoradic (Lehmer Rank) Engine** *(Mathematically Rigorous)*:
-   - Computes the exact rank $R \in [0, 52! - 1]$ of the card permutation using Lehmer coding.
-   - Maps the arbitrary-precision BigInt rank directly to a 32-byte array.
-   - Computes SHA-256 of the rank bytes to guarantee uniform bit distribution for BIP-39 entropy.
-2. **Canonical String Hashing Engine** *(Giacomo's "Non-Boring" Pragmatic Approach)*:
-   - Formats the 52-card order into a canonical string (e.g. `AS,10H,KD,2C,...`).
-   - Computes the SHA-256 digest of the canonical string to yield 256 bits of entropy.
+Poiché $225.58 \text{ bits} > 128 \text{ bits}$, un singolo mazzo mescolato supera abbondantemente i requisiti di casualità per un wallet Bitcoin standard a 12 parole.
 
 ---
 
-## 🛡️ Security & Air-Gapped Air-Gap Design
+## 🔒 Architettura & Sicurezza Air-Gapped
 
-- **100% Offline**: 0 network requests, 0 external APIs, 0 tracking.
-- **Native Web Crypto**: Uses browser-native `crypto.subtle` for SHA-256 hashing.
-- **Local Memory Privacy**: Includes a **Hide/Show Seed** privacy mask to shield your screen against shoulder surfing and screen recorders.
-- **Standalone HTML Export**: Export a single, self-contained `.html` bundle with one click to take to an air-gapped computer or Raspberry Pi.
+- **0 Network Requests**: Nessuna chiamata HTTP, nessun tracker, nessuna libreria esterna caricata via CDN.
+- **Web Crypto API**: Crittografia nativa del browser per SHA-256 e PBKDF2 HMAC-SHA512.
+- **Maschera di Privacy**: Protezione visiva per nascondere la frase mnemonica da sguardi indesiderati.
 
 ---
 
-## 🚀 Getting Started
+## 🚀 Guida all'Uso Offline
 
-### Prerequisites
-- Node.js (v18+) & npm
-
-### Development Server
+### Avvio Locale in Sviluppo
 ```bash
+git clone https://github.com/vostro-user/52entropy.git
+cd 52entropy
 npm install
 npm run dev
 ```
 
-### Production Build
+### Generazione File HTML Standalone per Air-Gap
+Per generare la versione da caricare su una chiavetta USB:
 ```bash
 npm run build
 ```
+Il file generato in `dist/index.html` è un **bundle auto-contenuto** (~248 kB) che può essere aperto con qualsiasi browser su un PC totalmente privo di connessione Internet.
 
 ---
 
-## 📄 License
+## 🧪 Verifica & Suite di Test
 
-MIT License — Free and open for the Bitcoin community.
+Il progetto include una suite di unit test con **Vitest**:
+
+```bash
+npx vitest run
+```
+
+### Test Superati (9/9):
+- ✅ Mappatura rango 0 per mazzo ordinato
+- ✅ Mappatura rango massimo $52! - 1$ per mazzo invertito
+- ✅ Validazione intervallo $[0, 52!-1]$ su permutazioni casuali
+- ✅ Serializzazione BigInt a 32 byte Big-Endian
+- ✅ Derivazione BIP-39 e verifica checksum su 12 e 24 parole
+- ✅ Derivazione PBKDF2 HMAC-SHA512 del Master Seed a 512 bit
+
+---
+
+## 🙏 Ringraziamenti & Licenza
+
+Un ringraziamento speciale a **Giacomo Zucco** ([@giacomozucco](https://x.com/giacomozucco)) per aver espresso e diffuso questa intuizione con la consueta chiarezza.
+
+Rilasciato sotto licenza **MIT** — Libero ed open-source per tutta la community Bitcoin.

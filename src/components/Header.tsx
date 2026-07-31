@@ -43,15 +43,15 @@ export const Header: React.FC<HeaderProps> = ({ lang, onLangChange }) => {
           </div>
           <div>
             <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-              <h1 style={{ fontSize: '1.5rem', fontWeight: 800, letterSpacing: '-0.5px' }}>
-                Deck Entropy <span style={{ color: 'var(--btc-orange)' }}>Bitcoin Seed</span>
+              <h1 style={{ fontSize: '1.6rem', fontWeight: 900, letterSpacing: '-0.5px' }}>
+                52<span style={{ color: 'var(--btc-orange)' }}>Entropy</span>
               </h1>
-              <span className="badge-btc">BIP-39</span>
+              <span className="badge-btc">Bitcoin BIP-39</span>
             </div>
             <p style={{ fontSize: '0.85rem', color: 'var(--text-muted)' }}>
               {isIt
-                ? 'Trasforma un mazzo di 52 carte mescolato in un Seed Bitcoin (12/24 Parole BIP-39)'
-                : 'Transform a shuffled 52-card deck into a Bitcoin Seed (12/24 BIP-39 Words)'}
+                ? "Dall'entropia fisica di un mazzo di 52 carte al Seed Bitcoin (BIP-39 12/24 parole)"
+                : 'From a physical 52-card deck entropy to Bitcoin Seed (12/24 BIP-39 words)'}
             </p>
           </div>
         </div>
@@ -128,7 +128,7 @@ export const Header: React.FC<HeaderProps> = ({ lang, onLangChange }) => {
             </button>
 
             <h3 style={{ color: 'var(--btc-orange)', marginBottom: '0.75rem', fontSize: '1.2rem', fontWeight: 700 }}>
-              Giacomo Zucco @giacomozucco (X / Twitter)
+              L'Intuizione di Giacomo Zucco (@giacomozucco on X)
             </h3>
 
             <blockquote
@@ -151,7 +151,7 @@ export const Header: React.FC<HeaderProps> = ({ lang, onLangChange }) => {
             </blockquote>
 
             <p style={{ fontSize: '0.85rem', color: 'var(--text-muted)' }}>
-              Questo software è nato per trasformare esattamente questa visione in realtà: offrire una soluzione offline, trasparente e matematicamente ineccepibile.
+              **52Entropy** è stato sviluppato in omaggio a questa visione: offrire una soluzione open-source, offline, trasparente e matematicamente ineccepibile.
             </p>
           </div>
         </div>
