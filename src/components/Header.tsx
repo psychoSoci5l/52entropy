@@ -11,7 +11,7 @@ export const Header: React.FC<HeaderProps> = ({ lang, onLangChange }) => {
   const isIt = lang === 'it';
 
   return (
-    <header style={{ marginBottom: '1.5rem' }}>
+    <header style={{ marginBottom: '1.75rem' }}>
       <div
         style={{
           display: 'flex',
@@ -19,82 +19,58 @@ export const Header: React.FC<HeaderProps> = ({ lang, onLangChange }) => {
           alignItems: 'center',
           flexWrap: 'wrap',
           gap: '1rem',
-          paddingBottom: '1rem',
-          borderBottom: '1px solid var(--border-color)',
+          paddingBottom: '1.25rem',
+          borderBottom: '1px solid var(--border-subtle)',
         }}
       >
-        <div style={{ display: 'flex', alignItems: 'center', gap: '0.8rem' }}>
+        {/* Logo + Title */}
+        <div style={{ display: 'flex', alignItems: 'center', gap: '0.9rem' }}>
           <div
             style={{
-              width: '44px',
-              height: '44px',
-              borderRadius: '12px',
-              background: 'linear-gradient(135deg, var(--btc-orange), #d97706)',
+              width: '46px',
+              height: '46px',
+              borderRadius: 'var(--radius-md)',
+              background: 'var(--accent)',
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
               fontWeight: 900,
-              fontSize: '1.4rem',
+              fontSize: '1.5rem',
               color: '#000',
-              boxShadow: '0 4px 15px var(--btc-orange-glow)',
+              boxShadow: '0 2px 12px var(--accent-glow)',
             }}
           >
             ♠
           </div>
           <div>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-              <h1 style={{ fontSize: '1.6rem', fontWeight: 900, letterSpacing: '-0.5px' }}>
-                52<span style={{ color: 'var(--btc-orange)' }}>Entropy</span>
-              </h1>
-              <span className="badge-btc">Bitcoin BIP-39</span>
-            </div>
-            <p style={{ fontSize: '0.85rem', color: 'var(--text-muted)' }}>
+            <h1 style={{ fontSize: '1.6rem', fontWeight: 900, letterSpacing: '-0.6px', lineHeight: 1.2 }}>
+              52<span style={{ color: 'var(--accent)' }}>Entropy</span>
+            </h1>
+            <p style={{ fontSize: '0.8rem', color: 'var(--text-secondary)', marginTop: '1px' }}>
               {isIt
-                ? "Dall'entropia fisica di un mazzo di 52 carte al Seed Bitcoin (BIP-39 12/24 parole)"
-                : 'From a physical 52-card deck entropy to Bitcoin Seed (12/24 BIP-39 words)'}
+                ? 'Entropia da 52 carte → Seed Bitcoin BIP-39'
+                : '52-card deck entropy → BIP-39 Bitcoin Seed'}
             </p>
           </div>
         </div>
 
-        <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', flexWrap: 'wrap' }}>
-          {/* Quote Context Button */}
+        {/* Actions */}
+        <div style={{ display: 'flex', alignItems: 'center', gap: '0.6rem', flexWrap: 'wrap' }}>
           <button
             onClick={() => setShowQuoteModal(true)}
-            style={{
-              display: 'flex',
-              alignItems: 'center',
-              gap: '0.4rem',
-              padding: '6px 14px',
-              borderRadius: '20px',
-              background: 'rgba(247, 147, 26, 0.12)',
-              border: '1px solid rgba(247, 147, 26, 0.3)',
-              color: 'var(--btc-orange)',
-              fontSize: '0.8rem',
-              fontWeight: 600,
-            }}
+            className="btn-secondary"
+            style={{ borderColor: 'rgba(247, 147, 26, 0.25)', color: 'var(--accent)', background: 'var(--accent-subtle)' }}
           >
             <MessageSquare size={14} />
-            <span>@giacomozucco Vision</span>
+            @giacomozucco
           </button>
 
-          {/* Language Toggle */}
           <button
             onClick={() => onLangChange(lang === 'it' ? 'en' : 'it')}
-            style={{
-              display: 'flex',
-              alignItems: 'center',
-              gap: '0.4rem',
-              padding: '6px 12px',
-              borderRadius: '20px',
-              background: 'rgba(255,255,255,0.05)',
-              border: '1px solid var(--border-color)',
-              color: 'var(--text-main)',
-              fontSize: '0.8rem',
-              fontWeight: 600,
-            }}
+            className="btn-secondary"
           >
             <Globe size={14} />
-            <span>{lang === 'it' ? '🇮🇹 IT' : '🇬🇧 EN'}</span>
+            {lang === 'it' ? 'IT' : 'EN'}
           </button>
         </div>
       </div>
@@ -105,8 +81,8 @@ export const Header: React.FC<HeaderProps> = ({ lang, onLangChange }) => {
           style={{
             position: 'fixed',
             inset: 0,
-            background: 'rgba(0,0,0,0.8)',
-            backdropFilter: 'blur(8px)',
+            background: 'rgba(0,0,0,0.85)',
+            backdropFilter: 'blur(12px)',
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
@@ -116,42 +92,43 @@ export const Header: React.FC<HeaderProps> = ({ lang, onLangChange }) => {
           onClick={() => setShowQuoteModal(false)}
         >
           <div
-            className="glass-panel"
-            style={{ maxWidth: '600px', width: '100%', padding: '1.5rem', position: 'relative' }}
+            className="panel"
+            style={{ maxWidth: '600px', width: '100%', padding: '1.75rem', position: 'relative' }}
             onClick={(e) => e.stopPropagation()}
           >
             <button
               onClick={() => setShowQuoteModal(false)}
-              style={{ position: 'absolute', top: '1rem', right: '1rem', color: 'var(--text-muted)' }}
+              style={{ position: 'absolute', top: '1rem', right: '1rem', color: 'var(--text-secondary)' }}
             >
               <X size={20} />
             </button>
 
-            <h3 style={{ color: 'var(--btc-orange)', marginBottom: '0.75rem', fontSize: '1.2rem', fontWeight: 700 }}>
-              L'Intuizione di Giacomo Zucco (@giacomozucco on X)
+            <h3 style={{ color: 'var(--accent)', marginBottom: '1rem', fontSize: '1.15rem', fontWeight: 700 }}>
+              L'Intuizione di Giacomo Zucco
             </h3>
 
             <blockquote
               style={{
-                background: 'rgba(0,0,0,0.4)',
-                borderLeft: '4px solid var(--btc-orange)',
-                padding: '1rem',
-                borderRadius: '0 8px 8px 0',
+                background: 'var(--bg-base)',
+                borderLeft: '3px solid var(--accent)',
+                padding: '1rem 1.1rem',
+                borderRadius: '0 var(--radius-sm) var(--radius-sm) 0',
                 fontStyle: 'italic',
-                fontSize: '0.95rem',
-                color: 'var(--text-main)',
+                fontSize: '0.92rem',
+                color: 'var(--text-primary)',
                 marginBottom: '1rem',
+                lineHeight: 1.6,
               }}
             >
-              "Calcolare l'entropia equivalente esatta é pallosissimo. Ma un mazzo di 52 carte ben mescolato ha piú di 128 bit. Ci sono metodi non noiosi anche se matematicamente meno eleganti. Un tool che parte dal mazzo e genera seed sul device sarebbe top. :)"
+              "Calcolare l'entropia equivalente esatta é pallosissimo. Ma un mazzo di 52 carte ben mescolato ha piú di 128 bit. Ci sono metodi non noiosi anche se matematicamente meno eleganti. Un tool che parte dal mazzo e genera seed sul device sarebbe top."
               <br /><br />
-              <span style={{ fontSize: '0.85rem', fontStyle: 'normal', color: 'var(--text-muted)' }}>
+              <span style={{ fontSize: '0.82rem', fontStyle: 'normal', color: 'var(--text-secondary)' }}>
                 "Un mazzo ben mescolato fornisce log2(52!) ≈ 225 bit, fin troppo per 128 bit di entropia necessarie in Bitcoin."
               </span>
             </blockquote>
 
-            <p style={{ fontSize: '0.85rem', color: 'var(--text-muted)' }}>
-              **52Entropy** è stato sviluppato in omaggio a questa visione: offrire una soluzione open-source, offline, trasparente e matematicamente ineccepibile.
+            <p style={{ fontSize: '0.84rem', color: 'var(--text-secondary)' }}>
+              <strong>52Entropy</strong> è stato sviluppato in omaggio a questa visione: offrire una soluzione open-source, offline, trasparente e matematicamente ineccepibile.
             </p>
           </div>
         </div>

@@ -111,16 +111,20 @@ export function App() {
           lang={lang}
         />
 
-        {/* BIP-39 Seed Mnemonic Result */}
-        <MnemonicResult
-          mnemonic={mnemonicResult}
-          wordCountTarget={wordCountTarget}
-          onWordCountChange={setWordCountTarget}
-          lang={lang}
-        />
+        {/* BIP-39 Seed Mnemonic Result — hero section with extra breathing room */}
+        <div style={{ marginTop: '0.5rem' }}>
+          <MnemonicResult
+            mnemonic={mnemonicResult}
+            wordCountTarget={wordCountTarget}
+            onWordCountChange={setWordCountTarget}
+            lang={lang}
+          />
+        </div>
 
         {/* Air-Gapped Security & Audit Panel */}
-        <SecurityAudit lang={lang} />
+        <div style={{ marginTop: '0.25rem' }}>
+          <SecurityAudit lang={lang} />
+        </div>
       </div>
     </div>
   );

@@ -1,7 +1,11 @@
 # 🃏⚡ 52Entropy — Physical Deck to Bitcoin BIP-39 Seed Generator
 
 <p align="center">
-  <img src="public/52entropy_ui_preview.png" alt="52Entropy Interface" width="720" />
+  <img src="public/52entropy_ui_demo.png" alt="52Entropy — Demo shuffle with entropy calculation and BIP-39 mnemonic" width="720" />
+</p>
+
+<p align="center">
+  <img src="public/52entropy_ui_tour.gif" alt="52Entropy UI Tour — empty state, demo, revealed seed" width="720" />
 </p>
 
 <p align="center">
