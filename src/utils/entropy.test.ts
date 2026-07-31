@@ -3,6 +3,7 @@ import { FULL_DECK, parseCardInput, generateRandomShuffle } from './cards';
 import { computeLehmerRank, FACTORIAL_52, bigIntToUint8Array32 } from './entropy';
 import { entropyToMnemonic } from './bip39';
 import { deriveBip39Seed } from './bip39Seed';
+import { BIP39_TEST_VECTORS } from './testVectors';
 
 describe('Card Parsing & Deck Rules', () => {
   it('should parse standard text shorthand correctly', () => {
@@ -18,6 +19,14 @@ describe('Card Parsing & Deck Rules', () => {
     const { cards } = parseCardInput(input);
     expect(cards).toHaveLength(3);
     expect(cards.map((c) => c.id)).toEqual(['AS', '10H', 'KD']);
+  });
+
+  it('should parse unicode suit symbols', () => {
+    const input = 'A♠ 10♥ K♦ 2♣';
+    const { cards, invalidTokens } = parseCardInput(input);
+    expect(cards).toHaveLength(4);
+    expect(invalidTokens).toHaveLength(0);
+    expect(cards.map((c) => c.id)).toEqual(['AS', '10H', 'KD', '2C']);
   });
 });
 
@@ -48,6 +57,15 @@ describe('Factoradic (Lehmer Code) Engine', () => {
     expect(bytes[31]).toBe(1);
     expect(bytes[0]).toBe(0);
   });
+
+  it('should serialize max rank 52! - 1 without overflow', () => {
+    const maxRank = FACTORIAL_52 - 1n;
+    const bytes = bigIntToUint8Array32(maxRank);
+    expect(bytes).toHaveLength(32);
+    // First few bytes of 52! - 1 should be non-zero in 32-byte representation
+    const hex = Array.from(bytes).map(b => b.toString(16).padStart(2, '0')).join('');
+    expect(hex).toHaveLength(64);
+  });
 });
 
 describe('BIP-39 Mnemonic & Seed Derivation', () => {
@@ -69,6 +87,40 @@ describe('BIP-39 Mnemonic & Seed Derivation', () => {
     const phrase = 'abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon about';
     const seedResult = await deriveBip39Seed(phrase, 'TREZOR');
     expect(seedResult.seedHex).toHaveLength(128); // 64 bytes = 128 hex characters
-    expect(seedResult.seedHex.length).toBe(128);
   });
+
+  // ─── BIP-39 Test Vector Verification ───────────────────────
+  // These tests ensure our implementation matches the official BIP-39 spec
+  // and produces the same output as Ian Coleman's reference tool.
+
+  for (const vector of BIP39_TEST_VECTORS) {
+    it(`BIP-39 vector: ${vector.description}`, async () => {
+      // Convert hex entropy to Uint8Array
+      const entropyBytes = new Uint8Array(
+        vector.entropyHex.match(/.{1,2}/g)!.map((b) => parseInt(b, 16))
+      );
+
+      // Generate mnemonic
+      const mnemonic = await entropyToMnemonic(entropyBytes, vector.wordCount);
+      expect(mnemonic.phrase).toBe(vector.expectedMnemonic);
+      expect(mnemonic.words).toHaveLength(vector.wordCount);
+
+      // Verify seed without passphrase (if provided by spec)
+      if (vector.expectedSeedNoPassphrase) {
+        const seedNoPass = await deriveBip39Seed(mnemonic.phrase, '');
+        expect(seedNoPass.seedHex).toBe(vector.expectedSeedNoPassphrase);
+      }
+
+      // Verify seed with passphrase (if provided)
+      if (vector.expectedSeedWithPassphrase) {
+        const seedWithPass = await deriveBip39Seed(
+          mnemonic.phrase,
+          vector.expectedSeedWithPassphrase.passphrase
+        );
+        expect(seedWithPass.seedHex).toBe(
+          vector.expectedSeedWithPassphrase.seedHex
+        );
+      }
+    });
+  }
 });

@@ -1,4 +1,6 @@
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700&display=swap');
+/* ⚠️ ZERO NETWORK CALLS — Air-Gapped Ready
+   All fonts use system-native stacks. No Google Fonts, no CDN.
+   The app renders identically offline on any modern OS. */
 
 :root {
   --bg-dark: #090d16;
@@ -23,8 +25,11 @@
   --suit-diamonds: #fb923c;
   --suit-clubs: #34d399;
 
-  --font-main: 'Inter', system-ui, -apple-system, sans-serif;
-  --font-mono: 'JetBrains Mono', monospace;
+  /* System font stack — crisp on macOS, Windows, Linux, iOS, Android */
+  --font-main: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen,
+               Ubuntu, Cantarell, 'Helvetica Neue', Arial, sans-serif;
+  --font-mono: 'SF Mono', 'Cascadia Code', 'Fira Code', Menlo, Consolas,
+               'DejaVu Sans Mono', monospace;
 }
 
 * {

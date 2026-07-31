@@ -1,13 +1,13 @@
 import type { Card } from '../utils/cards';
-import { generateRandomShuffle } from '../utils/cards';
-import { Shuffle, RotateCcw, Undo2, CheckCircle2, AlertTriangle, ListOrdered } from 'lucide-react';
+import { Shuffle, RotateCcw, Undo2, CheckCircle2, AlertTriangle, ListOrdered, ShieldAlert } from 'lucide-react';
 
 interface DeckProgressProps {
   selectedCards: Card[];
   onRemoveCard: (index: number) => void;
   onUndo: () => void;
   onReset: () => void;
-  onSetDeck: (cards: Card[]) => void;
+  onDemoShuffle: () => void;
+  isDemoDeck: boolean;
   lang: 'it' | 'en';
 }
 
@@ -16,18 +16,14 @@ export const DeckProgress: React.FC<DeckProgressProps> = ({
   onRemoveCard,
   onUndo,
   onReset,
-  onSetDeck,
+  onDemoShuffle,
+  isDemoDeck,
   lang,
 }) => {
   const count = selectedCards.length;
   const isComplete = count === 52;
   const progressPct = Math.round((count / 52) * 100);
   const isIt = lang === 'it';
-
-  const handleDemoShuffle = () => {
-    const randomDeck = generateRandomShuffle();
-    onSetDeck(randomDeck);
-  };
 
   return (
     <div className="glass-panel" style={{ padding: '1.25rem' }}>
@@ -91,7 +87,7 @@ export const DeckProgress: React.FC<DeckProgressProps> = ({
           </button>
 
           <button
-            onClick={handleDemoShuffle}
+            onClick={onDemoShuffle}
             className="pulse-button"
             style={{
               display: 'flex',
@@ -110,6 +106,31 @@ export const DeckProgress: React.FC<DeckProgressProps> = ({
           </button>
         </div>
       </div>
+
+      {/* ─── SECURITY WARNING: Demo Deck ─────────────────────── */}
+      {isDemoDeck && count > 0 && (
+        <div style={{
+          display: 'flex',
+          alignItems: 'flex-start',
+          gap: '0.6rem',
+          color: 'var(--accent-red)',
+          fontSize: '0.85rem',
+          marginBottom: '0.75rem',
+          background: 'rgba(239, 68, 68, 0.12)',
+          padding: '10px 14px',
+          borderRadius: '10px',
+          border: '1px solid rgba(239, 68, 68, 0.35)',
+        }}>
+          <ShieldAlert size={18} style={{ flexShrink: 0, marginTop: '1px' }} />
+          <div>
+            <strong>{isIt ? '⚠️ ATTENZIONE: Entropia NON sicura!' : '⚠️ WARNING: Insecure Entropy!'}</strong>
+            <br />
+            {isIt
+              ? "Questa sequenza usa Math.random() del browser, NON è crittograficamente sicura. Per un seed Bitcoin reale, mescola un mazzo fisico e inserisci le carte manualmente. Usa la Demo solo per test."
+              : "This sequence uses the browser's Math.random(), which is NOT cryptographically secure. For a real Bitcoin seed, shuffle a physical deck and enter the cards manually. Use Demo for testing only."}
+          </div>
+        </div>
+      )}
 
       {/* Progress Bar */}
       <div style={{ width: '100%', height: '8px', background: 'rgba(255,255,255,0.1)', borderRadius: '4px', overflow: 'hidden', marginBottom: '1rem' }}>

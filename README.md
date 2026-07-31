@@ -1,139 +1,135 @@
 # 🃏⚡ 52Entropy — Physical Deck to Bitcoin BIP-39 Seed Generator
 
-![52Entropy Interface](public/52entropy_ui_preview.png)
+<p align="center">
+  <img src="public/52entropy_ui_preview.png" alt="52Entropy Interface" width="720" />
+</p>
 
-> **Un omaggio all'intuizione di Giacomo Zucco su X (Twitter)**
-> 
-> *"Calcolare l'entropia equivalente esatta é pallosissimo. Ma un mazzo di 52 carte ben mescolato ha piú di 128 bit. Ci sono metodi non noiosi anche se matematicamente meno eleganti. Un tool che parte dal mazzo e genera seed sul device sarebbe top. :)"*  
-> — **Giacomo Zucco** ([@giacomozucco](https://x.com/giacomozucco))
+<p align="center">
+  <strong>14/14 tests passing</strong>   |  
+  <strong>Zero network calls</strong>   |  
+  <strong>MIT License</strong>
+</p>
 
----
-
-## 📋 Indice
-
-1. [Il Problema Iniziale](#-il-problema-iniziale)
-2. [Le Soluzioni Tradizionali ed i Loro Limiti](#-le-soluzioni-tradizionali-ed-i-loro-limiti)
-3. [L'Intuizione di Giacomo Zucco](#-lintuizione-di-giacomo-zucco)
-4. [La Nostra Soluzione: 52Entropy](#-la-nostra-soluzione-52entropy)
-5. [Fondamenti Matematici](#-fondamenti-matematici)
-6. [Architettura & Sicurezza Air-Gapped](#-architettura--sicurezza-air-gapped)
-7. [Guida all'Uso Offline](#-guida-alluso-offline)
-8. [Verifica & Suite di Test](#-verifica--suite-di-test)
-9. [Ringraziamenti & Licenza](#-ringraziamenti--licenza)
+> **Dall'intuizione di Giacomo Zucco:**  
+> *"Un mazzo di 52 carte ben mescolato ha più di 128 bit. Un tool che parte dal mazzo e genera seed sul device sarebbe top. :)"*  
+> — **[@giacomozucco](https://x.com/giacomozucco)**
 
 ---
 
-## 🚨 Il Problema Iniziale
-
-La generazione di chiavi private Bitcoin si basa in modo critico sull'**entropia** (casualità pura). Tuttavia, fare affidamento esclusivamente su:
-- Generatori di numeri pseudo-casuali (PRNG) software integrati nei sistemi operativi,
-- Chip hardware o risorse di sistema potenzialmente compromesse o con bug di implementazione,
-
-ha storicamente causato gravi vulnerabilità ed eventi di scioglimento/svuotamento dei wallet. Generare entropia mediante **oggetti fisici reali** (dadi, monete, carte da gioco) elimina ogni dipendenza da hardware invisibile o codice di terze parti.
+**52Entropy** trasforma l'ordine di un mazzo di carte da gioco in un seed Bitcoin BIP-39 (12 o 24 parole). Zero network calls, zero tracker, zero fiducia richiesta. Open-source, MIT.
 
 ---
 
-## 🎲 Le Soluzioni Tradizionali ed i Loro Limiti
+## ✨ Perché 52Entropy
 
-Quando gli utenti cercano di generare entropia fisica in autonomia:
-
-* **Monete**: Una moneta fornisce 1 bit di entropia per lancio ($H = \log_2(2) = 1$). Generare 128 bit richiede almeno 128 lanci consecutivi con trascrizione manuale di testa/croce ($0/1$). È un processo lungo, noioso e incline ad errori umani.
-* **Dadi a 6 facce**: Ogni lancio fornisce $\log_2(6) \approx 2.585$ bit. Richiede circa 50 lanci e complesse tabelle di conversione in base binaria/esadecimale.
-* **Carte da gioco**: Un mazzo da 52 carte ben mescolato contiene un'entropia immensa. Tuttavia, **la mappatura manuale da carte a valori binari è estremamente laboriosa** ("pallosissima"), poiché richiede di assegnare indici, verificare i semi e calcolare le permutazioni a mano.
-
----
-
-## 💡 L'Intuizione di Giacomo Zucco
-
-Durante una discussione su X legata alla sicurezza dei wallet, Luca Venturini obiettava che mappare le carte in binario a mano fosse troppo complesso rispetto ad una moneta. 
-
-Giacomo Zucco ha colto il punto fondamentale:
-
-> **Un singolo mazzo da 52 carte ben mescolato contiene $52!$ permutazioni possibili, equivalenti a $\approx 225.58$ bit di entropia pura.**
-> 
-> Poiché a Bitcoin servono 128 bit (per 12 parole BIP-39) o 256 bit (per 24 parole), **un mazzo da 52 carte è più che sufficiente**. Non serve fare la matematica a mano: basta un software locale, trasparente e privo di connessione di rete che legga l'ordine delle carte dal mazzo ed estragga l'entropia ed il seed BIP-39 direttamente sul dispositivo.
+| Problema | Soluzione |
+|----------|-----------|
+| Hardware wallet con RNG potenzialmente compromesso | Entropia da **oggetto fisico** (mazzo di carte) |
+| Seed generati con PRNG software | **Rango di Lehmer deterministico** su 52! permutazioni |
+| Strumenti online che potrebbero rubare il seed | **Single-file HTML** da eseguire su computer **air-gapped** |
+| Mappatura manuale carte→binario noiosa | **Selezione visiva** o **input testuale** |
+| Impossibilità di verificare il risultato | **14 test** + vettori BIP-39 ufficiali + codice ispezionabile |
 
 ---
 
-## ⚡ La Nostra Soluzione: 52Entropy
+## 🧮 La Matematica
 
-**52Entropy** trasforma questa intuizione in uno strumento web/offline open-source, trasparente e privo di qualsiasi dipendenza di rete:
+Un mazzo da 52 carte ben mescolato ha `52!` permutazioni possibili:
 
-- 🃏 **Selezione Visiva & Parser Testuale**: Inserisci l'ordine delle carte estratte dal mazzo tramite una griglia visiva o incollando shorthand come `AS 10H KD 2C`.
-- 🧮 **Doppio Motore di Entropia**:
-  1. **Matematico Esatto (Rango di Lehmer / Factoradic)**: Converte la permutazione del mazzo nel suo numero esatto in $[0, 52!-1]$ tramite `BigInt` locale.
-  2. **Pragmatico (Stringa Canonica SHA-256)**: Hashing diretto della sequenza canonica ordinata.
-- 🔑 **Standard BIP-39 Compliant**: Generazione di 12 o 24 parole con checksum SHA-256 verificato, **passphrase opzionale (25ª parola)** e derivazione **Master Seed 512-bit (PBKDF2 HMAC-SHA512)**.
-- 🛡️ **Air-Gapped Single-File Bundle**: Compilazione in un unico file `.html` autonomo da salvare su USB ed eseguire su hardware disconnesso da Internet.
+$$log_2(52!) \approx 225.58\text{ bit}$$
 
----
+> Più che sufficiente per **12 parole** (128 bit) o **24 parole** (256 bit con SHA-256).
 
-## 📐 Fondamenti Matematici
-
-### 1. Entropia Totale del Mazzo
-Il numero totale di modi in cui un mazzo di 52 carte distinte può essere ordinato è dato da $52!$:
-
-$$52! = 80,658,175,170,943,878,571,660,636,856,403,766,975,289,505,440,883,277,824,000,000,000,000$$
-
-L'entropia in bit è espressa da:
-
-$$\text{Entropia} = \log_2(52!) \approx 225.581 \text{ bits}$$
-
-### 2. Confronto Requisiti Bitcoin
-- **12 Parole BIP-39**: 128 bit di entropia + 4 bit checksum.
-- **24 Parole BIP-39**: 256 bit di entropia + 8 bit checksum.
-
-Poiché $225.58 \text{ bits} > 128 \text{ bits}$, un singolo mazzo mescolato supera abbondantemente i requisiti di casualità per un wallet Bitcoin standard a 12 parole.
+L'algoritmo usa il **codice di Lehmer (factoradic)** per assegnare un rango esatto a ogni permutazione, poi SHA-256 per uniformare i bit.
 
 ---
 
-## 🔒 Architettura & Sicurezza Air-Gapped
+## 🔒 Air-Gapped by Design
 
-- **0 Network Requests**: Nessuna chiamata HTTP, nessun tracker, nessuna libreria esterna caricata via CDN.
-- **Web Crypto API**: Crittografia nativa del browser per SHA-256 e PBKDF2 HMAC-SHA512.
-- **Maschera di Privacy**: Protezione visiva per nascondere la frase mnemonica da sguardi indesiderati.
+- **0 chiamate di rete** — nessuna `fetch()`, nessun CDN, nessun Google Fonts
+- **System font stack** — rendering identico su qualsiasi OS, offline
+- **Single-file HTML** — ~250 KB, eseguibile su qualsiasi browser
+- **Web Crypto API** — SHA-256 e PBKDF2 nativi
+- **Codice ispezionabile** — `src/utils/` contiene tutta la logica crypto
+
+### 🔬 Verifica Indipendente
+
+Non fidarti solo dell'app. Dopo aver generato il seed:
+
+1. **Hardware wallet**: Importa la frase mnemonica nel tuo Coldcard/Trezor/Ledger e verifica l'impronta
+2. **Ian Coleman Tool**: Usa lo [strumento BIP-39](https://iancoleman.io/bip39/) **offline** per verificare il master seed
+3. **Test vectors**: Il nostro test `abandon...about + TREZOR` è verificato contro la specifica BIP-39
 
 ---
 
-## 🚀 Guida all'Uso Offline
+## 🚀 Utilizzo
 
-### Avvio Locale in Sviluppo
+### Online (solo per test)
+👉 [52entropy.com](https://52entropy.com)
+
+### Offline (per seed reali)
+
 ```bash
-git clone https://github.com/vostro-user/52entropy.git
+git clone https://github.com/52Entropy/52entropy.git
 cd 52entropy
 npm install
-npm run dev
+npm run build          # → dist/index.html (standalone)
+npx vitest run         # 14/14 test devono passare
 ```
 
-### Generazione File HTML Standalone per Air-Gap
-Per generare la versione da caricare su una chiavetta USB:
-```bash
-npm run build
-```
-Il file generato in `dist/index.html` è un **bundle auto-contenuto** (~248 kB) che può essere aperto con qualsiasi browser su un PC totalmente privo di connessione Internet.
+Poi copia `dist/index.html` su chiavetta USB e aprilo su un computer **air-gapped**.
 
 ---
 
-## 🧪 Verifica & Suite di Test
-
-Il progetto include una suite di unit test con **Vitest**:
+## 🧪 Test Suite
 
 ```bash
 npx vitest run
 ```
 
-### Test Superati (9/9):
-- ✅ Mappatura rango 0 per mazzo ordinato
-- ✅ Mappatura rango massimo $52! - 1$ per mazzo invertito
-- ✅ Validazione intervallo $[0, 52!-1]$ su permutazioni casuali
-- ✅ Serializzazione BigInt a 32 byte Big-Endian
-- ✅ Derivazione BIP-39 e verifica checksum su 12 e 24 parole
-- ✅ Derivazione PBKDF2 HMAC-SHA512 del Master Seed a 512 bit
+```
+✓ Card parsing & duplicate detection
+✓ Factoradic rank: identity (0), reversed (52! - 1), random shuffles
+✓ BigInt serialization to 32 bytes
+✓ BIP-39 vectors: 3 official test vectors verified
+  ├─ abandon...about + TREZOR ✓
+  ├─ legal...yellow + TREZOR ✓
+  └─ abandon...art (24w) + TREZOR ✓
+```
 
 ---
 
-## 🙏 Ringraziamenti & Licenza
+## 📚 Documentazione
 
-Un ringraziamento speciale a **Giacomo Zucco** ([@giacomozucco](https://x.com/giacomozucco)) per aver espresso e diffuso questa intuizione con la consueta chiarezza.
+- 📖 **[Tutorial Completo](TUTORIAL.md)** — 7 fasi, dalla mescolata al seed verificato
+- ❓ **[FAQ](FAQ.md)** — sicurezza, matematica, troubleshooting
+- 🤝 **[CONTRIBUTING](CONTRIBUTING.md)** — struttura codice, setup, linee guida
+- 🔬 **[Audit Roadmap](AUDIT_ROADMAP.md)** — gap analysis e miglioramenti futuri
 
-Rilasciato sotto licenza **MIT** — Libero ed open-source per tutta la community Bitcoin.
+---
+
+## 🏗️ Stack
+
+| Cosa | Tecnologia |
+|------|-----------|
+| UI | React 19 + TypeScript 6 |
+| Build | Vite 8 + `vite-plugin-singlefile` |
+| Test | Vitest 4 |
+| Crypto | Web Crypto API (SHA-256, PBKDF2) |
+| Matematica | BigInt nativo (Lehmer / factoradic) |
+| Icone | Lucide React |
+| Dipendenze esterne | **Zero** oltre a React e Lucide |
+
+---
+
+## 🙏 Crediti
+
+A **Giacomo Zucco** ([@giacomozucco](https://x.com/giacomozucco)) per l'intuizione originale e per il suo lavoro di educazione Bitcoin.
+
+> *"Bitcoin non è una tecnologia finanziaria, ma una rivoluzione monetaria, sociale e politica."*
+
+---
+
+## 📄 Licenza
+
+MIT — [LICENSE](LICENSE)

@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import type { Card } from './utils/cards';
+import { generateRandomShuffle } from './utils/cards';
 import { calculateDeckEntropy } from './utils/entropy';
 import type { EntropyCalculationResult, EntropyEngineType } from './utils/entropy';
 import { entropyToMnemonic } from './utils/bip39';
@@ -21,6 +22,7 @@ export function App() {
 
   const [entropyResult, setEntropyResult] = useState<EntropyCalculationResult | null>(null);
   const [mnemonicResult, setMnemonicResult] = useState<MnemonicResultType | null>(null);
+  const [isDemoDeck, setIsDemoDeck] = useState(false);
 
   // Recalculate entropy and BIP-39 mnemonic whenever cards, engine, or wordCountTarget change
   useEffect(() => {
@@ -51,22 +53,32 @@ export function App() {
   const handleSelectCard = (card: Card) => {
     if (selectedCards.some((c) => c.id === card.id)) return;
     setSelectedCards((prev) => [...prev, card]);
+    setIsDemoDeck(false);
   };
 
   const handleRemoveCard = (index: number) => {
     setSelectedCards((prev) => prev.filter((_, i) => i !== index));
+    setIsDemoDeck(false);
   };
 
   const handleUndo = () => {
     setSelectedCards((prev) => prev.slice(0, -1));
+    setIsDemoDeck(false);
   };
 
   const handleReset = () => {
     setSelectedCards([]);
+    setIsDemoDeck(false);
   };
 
   const handleApplyCards = (cards: Card[]) => {
     setSelectedCards(cards);
+    setIsDemoDeck(false);
+  };
+
+  const handleDemoShuffle = () => {
+    setSelectedCards(generateRandomShuffle());
+    setIsDemoDeck(true);
   };
 
   return (
@@ -82,7 +94,8 @@ export function App() {
             onRemoveCard={handleRemoveCard}
             onUndo={handleUndo}
             onReset={handleReset}
-            onSetDeck={handleApplyCards}
+            onDemoShuffle={handleDemoShuffle}
+            isDemoDeck={isDemoDeck}
             lang={lang}
           />
         </div>
