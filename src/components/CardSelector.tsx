@@ -56,14 +56,12 @@ export const CardSelector: React.FC<CardSelectorProps> = ({ selectedCards, onSel
         </div>
       </div>
 
-      {/* Grid of 52 Cards */}
+      {/* Grid of 52 Cards — full width, no scrolling */}
       <div
         style={{
           display: 'grid',
           gridTemplateColumns: 'repeat(auto-fill, minmax(68px, 1fr))',
           gap: '8px',
-          maxHeight: '380px',
-          overflowY: 'auto',
           padding: '4px',
         }}
       >

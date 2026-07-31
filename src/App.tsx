@@ -86,9 +86,12 @@ export function App() {
       <Header lang={lang} onLangChange={setLang} />
 
       <div style={{ display: 'flex', flexDirection: 'column', gap: '1.25rem' }}>
-        {/* Main Grid: Card Selector + Deck Progress */}
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(340px, 1fr))', gap: '1.25rem' }}>
-          <CardSelector selectedCards={selectedCards} onSelectCard={handleSelectCard} lang={lang} />
+        {/* Card Selector — full width, all 52 cards visible without scrolling */}
+        <CardSelector selectedCards={selectedCards} onSelectCard={handleSelectCard} lang={lang} />
+
+        {/* Quick Text + Deck Progress side by side */}
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))', gap: '1.25rem' }}>
+          <QuickTextInput onApplyCards={handleApplyCards} lang={lang} />
           <DeckProgress
             selectedCards={selectedCards}
             onRemoveCard={handleRemoveCard}
@@ -99,9 +102,6 @@ export function App() {
             lang={lang}
           />
         </div>
-
-        {/* Quick Text Input */}
-        <QuickTextInput onApplyCards={handleApplyCards} lang={lang} />
 
         {/* Entropy Calculation Display */}
         <EntropyDisplay
