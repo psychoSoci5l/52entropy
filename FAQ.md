@@ -55,6 +55,10 @@ Il rango di Lehmer non è distribuito uniformemente nei suoi bit più significat
 
 Sì. Il file `dist/index.html` è completamente auto-contenuto. Aprilo con qualsiasi browser moderno (Chromium, Firefox, Safari) su un computer senza connessione di rete. Non serve installare nulla.
 
+### Posso usarla su iPhone?
+
+Per consultare o provare l'interfaccia sì, ma **non è il dispositivo consigliato per creare un seed con fondi reali**: un iPhone normalmente connesso non soddisfa il modello air-gapped del progetto. Scarica l'HTML standalone dalla [pagina Releases](https://github.com/psychoSoci5l/52entropy/releases/latest), conservalo in File e verifica l'hash pubblicato; per la generazione reale trasferiscilo su un computer offline che controlli.
+
 ### Come posso verificare che il seed generato sia corretto?
 
 1. **Test vector integrato**: L'app viene testata automaticamente contro i vettori ufficiali BIP-39 (abandon...about + TREZOR).

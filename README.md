@@ -118,6 +118,14 @@ Non fidarti solo dell'app. Dopo aver generato il seed:
 
 ## 🚀 Utilizzo
 
+### Subito, senza installare nulla
+
+Scarica l'[**HTML standalone dell'ultima release**](https://github.com/psychoSoci5l/52entropy/releases/latest/download/52entropy-offline.html): è un singolo file pronto per browser moderni, senza Node.js né build locale.
+
+- **Desktop / computer air-gapped**: copia il file su USB e aprilo direttamente nel browser.
+- **iPhone**: il file è utile per conservarlo e verificarlo, ma per generare un seed reale usa un computer offline controllato. iOS non è il target air-gapped del progetto e l'apertura di HTML locali dipende dalle restrizioni dell'app File/Safari.
+- Non aprire `index.html` nella radice della repository: è il sorgente Vite, non l'app compilata.
+
 ### Online (solo per test)
 👉 [52entropy.com](https://52entropy.com)
 
@@ -131,7 +139,7 @@ npm run build          # → dist/index.html (standalone)
 npx vitest run         # 14/14 test devono passare
 ```
 
-Poi copia `dist/index.html` su chiavetta USB e aprilo su un computer **air-gapped**.
+Poi copia `dist/index.html` su chiavetta USB e aprilo su un computer **air-gapped**. Per chi non sviluppa, il file della release qui sopra è già questo artefatto compilato.
 
 ---
 
