@@ -81,6 +81,19 @@ Il seed generato sarà completamente diverso — anche un solo errore produce un
 
 No, 52Entropy è progettato per il mazzo standard da 52 carte (francese). Mazzi diversi (ramino, poker ridotto) non sono supportati perché la matematica del rango di Lehmer dipende dal numero esatto di carte.
 
+### Il pulsante "Copia" mette il seed nella clipboard: è sicuro?
+
+La clipboard di sistema è **leggibile da altre applicazioni** (su alcuni sistemi anche da app installate di terze parti). È un rischio noto e accettato di qualsiasi strumento desktop. Consigli:
+
+1. Copia il seed **solo quando sei pronto a incollarlo** nel wallet.
+2. Incolla, verifica, e **svuota la clipboard subito dopo** (copia un testo innocuo, es. una spazio).
+3. Su computer air-gapped il rischio è minimo: non ci sono altre app di sync o condivisione.
+4. Per il massimo della sicurezza, trascrivi le parole **a mano** invece di copiarle.
+
+### L'export HTML contiene il mio seed?
+
+No. Il file esportato viene **sanitizzato**: le parole rivelate, la passphrase e l'hex del master seed vengono rimossi prima del download. Il file esportato riparte nello stato mascherato iniziale — puoi verificarlo aprendolo: non contiene traccia del seed generato prima dell'export. Il test automatico `Export sanitization` nella suite Vitest copre questo comportamento.
+
 ### La passphrase BIP-39 (25ª parola) è obbligatoria?
 
 No, è opzionale. La passphrase aggiunge un ulteriore strato di sicurezza: anche se qualcuno scopre le tue 12/24 parole, senza la passphrase non può accedere ai fondi. Scegli una passphrase **memorabile ma non banale**.

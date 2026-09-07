@@ -178,10 +178,17 @@ export const MnemonicResult: React.FC<MnemonicResultProps> = ({
 
           {/* Action Row */}
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '0.75rem', background: 'var(--bg-base)', padding: '12px 14px', borderRadius: 'var(--radius-md)', border: '1px solid var(--border-subtle)' }}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '0.4rem', color: 'var(--ok)', fontSize: '0.85rem' }}>
-              <ShieldCheck size={18} />
-              <span>
-                {isIt ? 'Checksum SHA-256 Verificato' : 'SHA-256 Checksum Verified'}
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '2px' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '0.4rem', color: 'var(--ok)', fontSize: '0.85rem' }}>
+                <ShieldCheck size={18} />
+                <span>
+                  {isIt ? 'Checksum SHA-256 Verificato' : 'SHA-256 Checksum Verified'}
+                </span>
+              </div>
+              <span style={{ fontSize: '0.72rem', color: 'var(--text-tertiary)' }}>
+                {isIt
+                  ? 'La clipboard è leggibile da altre app: incolla il seed nel wallet e svuotala subito.'
+                  : 'The clipboard is readable by other apps: paste the seed into your wallet and clear it right after.'}
               </span>
             </div>
 
