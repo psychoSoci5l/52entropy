@@ -91,8 +91,8 @@ export const DeckProgress: React.FC<DeckProgressProps> = ({
           <span>
             <strong>{isIt ? '⚠️ Demo — Entropia NON sicura.' : '⚠️ Demo — Insecure entropy.'}</strong>
             {' '}{isIt
-              ? 'Usa Math.random(). Per un seed reale mescola un mazzo fisico.'
-              : 'Uses Math.random(). For a real seed, shuffle a physical deck.'}
+              ? 'Mazzo generato via software (CSPRNG), non da un mazzo fisico. Per un seed reale mescola e trascrivi le carte a mano.'
+              : 'Software-generated deck (CSPRNG), not a physical one. For a real seed, shuffle and transcribe cards by hand.'}
           </span>
         </div>
       )}

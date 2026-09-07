@@ -7,6 +7,7 @@ import { entropyToMnemonic } from './utils/bip39';
 import type { MnemonicResult as MnemonicResultType } from './utils/bip39';
 
 import { Header } from './components/Header';
+import { Onboarding } from './components/Onboarding';
 import { CardSelector } from './components/CardSelector';
 import { DeckProgress } from './components/DeckProgress';
 import { QuickTextInput } from './components/QuickTextInput';
@@ -86,6 +87,9 @@ export function App() {
       <Header lang={lang} onLangChange={setLang} />
 
       <div style={{ display: 'flex', flexDirection: 'column', gap: '1.25rem' }}>
+        {/* Onboarding — collapsible how-to, deck shuffling guidance */}
+        <Onboarding lang={lang} />
+
         {/* Card Selector — full width, all 52 cards visible without scrolling */}
         <CardSelector selectedCards={selectedCards} onSelectCard={handleSelectCard} lang={lang} />
 

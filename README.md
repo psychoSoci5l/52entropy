@@ -9,7 +9,7 @@
 </p>
 
 <p align="center">
-  <strong>14/14 tests passing</strong>   |  
+  <strong>17/17 tests passing</strong>   |  
   <strong>Zero network calls</strong>   |  
   <strong>MIT License</strong>
 </p>
@@ -136,7 +136,7 @@ git clone https://github.com/52Entropy/52entropy.git
 cd 52entropy
 npm install
 npm run build          # → dist/index.html (standalone)
-npx vitest run         # 14/14 test devono passare
+npx vitest run         # 17/17 test devono passare
 ```
 
 Poi copia `dist/index.html` su chiavetta USB e aprilo su un computer **air-gapped**. Per chi non sviluppa, il file della release qui sopra è già questo artefatto compilato.
@@ -152,6 +152,8 @@ npx vitest run
 ```
 ✓ Card parsing & duplicate detection
 ✓ Factoradic rank: identity (0), reversed (52! - 1), random shuffles
+✓ CSPRNG demo shuffle: full permutation, no trivial bias
+✓ Export sanitization: no seed material in downloaded HTML
 ✓ BigInt serialization to 32 bytes
 ✓ BIP-39 vectors: 3 official test vectors verified
   ├─ abandon...about + TREZOR ✓
