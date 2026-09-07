@@ -80,12 +80,27 @@ export function parseCardInput(text: string): { cards: Card[]; invalidTokens: st
 }
 
 /**
- * Fisher-Yates shuffle generator for demo / testing.
+ * Fisher-Yates shuffle using a cryptographically secure random source
+ * (crypto.getRandomValues with rejection sampling to avoid modulo bias).
+ *
+ * Even though the demo shuffle is not a substitute for a physically shuffled
+ * deck, using a CSPRNG removes any risk of a predictable software-generated
+ * seed being mistaken for a real one.
  */
 export function generateRandomShuffle(): Card[] {
   const deck = [...FULL_DECK];
+  const rng = new Uint32Array(1);
+
   for (let i = deck.length - 1; i > 0; i--) {
-    const j = Math.floor(Math.random() * (i + 1));
+    // Rejection sampling: draw uniform u in [0, 2^32), accept only values
+    // below the largest multiple of (i + 1) to avoid modulo bias.
+    const bound = i + 1;
+    const limit = Math.floor(0x100000000 / bound) * bound;
+    let j: number;
+    do {
+      crypto.getRandomValues(rng);
+      j = rng[0] % bound;
+    } while (rng[0] >= limit);
     [deck[i], deck[j]] = [deck[j], deck[i]];
   }
   return deck;

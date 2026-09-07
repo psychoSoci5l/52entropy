@@ -154,6 +154,7 @@ export const MnemonicResult: React.FC<MnemonicResultProps> = ({
               type={isMasked ? 'password' : 'text'}
               value={passphrase}
               onChange={(e) => setPassphrase(e.target.value)}
+              autoComplete="off"
               placeholder={isIt ? 'Inserisci passphrase opzionale per protezione ulteriore...' : 'Enter optional passphrase for extra security...'}
               className="input-field"
             />

@@ -1,6 +1,7 @@
 import { describe, it, expect } from 'vitest';
 import { FULL_DECK, parseCardInput, generateRandomShuffle } from './cards';
 import { computeLehmerRank, FACTORIAL_52, bigIntToUint8Array32 } from './entropy';
+import { sanitizeExportedHtml } from './exporter';
 import { entropyToMnemonic } from './bip39';
 import { deriveBip39Seed } from './bip39Seed';
 import { BIP39_TEST_VECTORS } from './testVectors';
@@ -65,6 +66,49 @@ describe('Factoradic (Lehmer Code) Engine', () => {
     // First few bytes of 52! - 1 should be non-zero in 32-byte representation
     const hex = Array.from(bytes).map(b => b.toString(16).padStart(2, '0')).join('');
     expect(hex).toHaveLength(64);
+  });
+});
+
+describe('Secure Demo Shuffle (CSPRNG)', () => {
+  it('should produce a valid full-deck permutation (all 52 unique cards)', () => {
+    const shuffle = generateRandomShuffle();
+    expect(shuffle).toHaveLength(52);
+    expect(new Set(shuffle.map((c) => c.id)).size).toBe(52);
+    expect([...shuffle].sort((a, b) => a.deckIndex - b.deckIndex).map((c) => c.deckIndex))
+      .toEqual(Array.from({ length: 52 }, (_, i) => i));
+  });
+
+  it('should not be biased toward the identity or reversed deck', () => {
+    const identity = [...FULL_DECK];
+    const reversed = [...FULL_DECK].reverse();
+    for (let i = 0; i < 10; i++) {
+      const shuffle = generateRandomShuffle();
+      const isIdentity = shuffle.every((c, j) => c.id === identity[j].id);
+      const isReversed = shuffle.every((c, j) => c.id === reversed[j].id);
+      expect(isIdentity || isReversed).toBe(false);
+    }
+  });
+});
+
+describe('Standalone Export Sanitization', () => {
+  it('should strip revealed mnemonic words, passphrase and seed hex from exported HTML', () => {
+    // Realistic DOM snapshot: revealed word tile followed by idx marker,
+    // passphrase input with serialized value, long hex seed.
+    const domSnapshot = [
+      '<html><head><title>52Entropy</title></head><body>',
+      '<div style="font-size:1.05rem;font-weight:700" >model</div>',
+      '<div style="font-size:0.65rem" >idx: 1140</div>',
+      '<input type="password" value="test-pass-123" class="input-field">',
+      '<div class="mono-data">bb4fa81372b01e7bf8e26679c3c73f71f122243fa692f0d65f7e043623d437d008c067dedafd06ae2ec260adf6d69d3163b6a8645df7ef05a35897bea9ae8e0b</div>',
+      '</body></html>',
+    ].join('');
+
+    const exported = sanitizeExportedHtml(domSnapshot);
+    expect(exported).not.toContain('>model<');
+    expect(exported).not.toContain('test-pass-123');
+    expect(exported).not.toContain('bb4fa81372b01e7bf8e26679c3c73f71f122243fa692f0d65f7e043623d437d');
+    expect(exported).toContain('idx: 1140');
+    expect(exported).toContain('52Entropy');
   });
 });
 

@@ -1,5 +1,5 @@
 import type { EntropyCalculationResult, EntropyEngineType } from '../utils/entropy';
-import { Calculator, Cpu, Hash } from 'lucide-react';
+import { Calculator, Cpu, Hash, AlertTriangle } from 'lucide-react';
 
 interface EntropyDisplayProps {
   entropyResult: EntropyCalculationResult | null;
@@ -93,6 +93,21 @@ export const EntropyDisplay: React.FC<EntropyDisplayProps> = ({
       {/* Deep Math Details */}
       {entropyResult && (
         <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
+          {!isComplete && (
+            <div style={{
+              display: 'flex', alignItems: 'center', gap: '0.5rem',
+              fontSize: '0.78rem', color: 'var(--text-secondary)',
+              background: 'var(--bg-elevated)', padding: '8px 12px',
+              borderRadius: 'var(--radius-sm)', border: '1px dashed var(--border-subtle)',
+            }}>
+              <AlertTriangle size={14} color="var(--accent)" style={{ flexShrink: 0 }} />
+              <span>
+                {isIt
+                  ? 'Digest sotto = solo anteprima non crittografica. L\'entropia reale si calcola solo con le 52 carte complete.'
+                  : 'Digest below = non-cryptographic preview only. Real entropy is computed only with the complete 52-card deck.'}
+              </span>
+            </div>
+          )}
           {selectedEngine === 'factoradic' && isComplete && entropyResult.lehmerRankBigInt && (
             <div style={{ background: 'var(--bg-elevated)', padding: '14px', borderRadius: 'var(--radius-md)', border: '1px solid var(--border-subtle)' }}>
               <div style={{ display: 'flex', alignItems: 'center', gap: '0.4rem', fontSize: '0.8rem', color: 'var(--accent)', marginBottom: '6px', fontWeight: 600 }}>
